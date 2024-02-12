@@ -6,22 +6,28 @@
 // X16 - Mach System Call function number
 //
 
-.global _start			// Provide program starting address to linker
-.align 4			// Make sure everything is aligned properly
+.macro .exit code
+    mov x0, #\code
+    mov x16, #1 // exit syscall
+    svc #0x80
+.endm
+
+.macro .write fd, buf, len
+    mov x0, #\fd
+    adr x1, \buf
+    mov x2, #\len
+    mov x16, #4     // write syscall
+    svc #0x80
+.endm
+
+.global _start  // Provide program starting address to linker
+.align 4        // Make sure everything is aligned properly
 
 // Setup the parameters to print hello world
 // and then call the Kernel to do it.
-_start: mov	X0, #1		// 1 = StdOut
-	adr	X1, helloworld 	// string to print
-	mov	X2, #13	    	// length of our string
-	mov	X16, #4		// Unix write system call
-	svc	#0x80		// Call kernel to output the string
+_start: 
+    .write 1, helloworld, hlength
+    .exit 0
 
-// Setup the parameters to exit the program
-// and then call the kernel to do it.
-	mov     X0, #0		// Use 0 return code
-	mov     X16, #1		// System call number 1 terminates this program
-	svc     #0x80		// Call kernel to terminate the program
-
-helloworld:      .ascii  "Hello World!\n"
-
+helloworld: .ascii  "Hello, World!\n"
+hlength = . - helloworld

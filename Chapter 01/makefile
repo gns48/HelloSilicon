@@ -3,3 +3,7 @@ HelloWorld: HelloWorld.o
 
 HelloWorld.o: HelloWorld.s
 	as -arch arm64 -o HelloWorld.o HelloWorld.s
+
+clean:
+	rm -f HelloWorld HelloWorld.o
+
